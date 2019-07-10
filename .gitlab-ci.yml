@@ -1,0 +1,43 @@
+image: docker:stable
+stages:
+  - package
+  - docker_build
+  - deploy_k8s
+variables:
+  KUBECONFIG: /etc/deploy/config
+  #MAVEN_OPTS: "-Dmaven.repo.local=/opt/.m2/repository"
+mvn_build_job:
+  image: registry.cn-beijing.aliyuncs.com/codepipeline/public-blueocean-codepipeline-slave-java:0.1-63b99a20
+  stage: package
+  tags:
+    - k8s-runner
+  script:
+    - mvn package -B -DskipTests
+docker_build_job:
+  image: registry.cn-beijing.aliyuncs.com/codepipeline/public-blueocean-codepipeline-slave-java:0.1-63b99a20
+  stage: docker_build
+  services:
+    - docker:dind
+  variables:
+    DOCKER_DRIVER: overlay
+    DOCKER_HOST: tcp://localhost:2375
+  tags:
+    - k8s-runner
+  script:
+    - docker login -u $CI_REGISTRY_USERNAME -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - mkdir target
+    - pwd
+    - cp /opt/demo.war target/demo.war
+    - docker build -t $CI_REGISTRY/cicd/java-demo:$CI_PIPELINE_ID .
+    - docker push $CI_REGISTRY/cicd/java-demo:$CI_PIPELINE_ID
+deploy_k8s_job:
+  image: registry.cn-beijing.aliyuncs.com/codepipeline/public-blueocean-codepipeline-slave-java:0.1-63b99a20
+  stage: deploy_k8s
+  tags:
+    - k8s-runner
+  script:
+    - mkdir -p /etc/deploy
+    - echo $kube_config |base64 -d > $KUBECONFIG
+    - sed -i "s/IMAGE_TAG/$CI_PIPELINE_ID/g" deployment.yaml
+    - cat deployment.yaml
+    - kubectl apply -f deployment.yaml
