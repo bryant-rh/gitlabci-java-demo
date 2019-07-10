@@ -2,6 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: java-demo
+  namespace: gitlab
 spec:
   replicas: 2
   selector:
@@ -12,6 +13,8 @@ spec:
       labels:
         app: java-demo
     spec:
+      imagePullSecrets:
+        - name: myregistry
       containers:
       - name: java-demo
         image: harbor.hitales.ai/cicd/java-demo:IMAGE_TAG
@@ -23,6 +26,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: java-demo
+  namespace: gitlab
 spec:
   ports:
   - port: 80

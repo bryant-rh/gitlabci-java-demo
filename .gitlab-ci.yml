@@ -49,3 +49,4 @@ deploy_k8s_job:
     - sed -i "s/IMAGE_TAG/$CI_PIPELINE_ID/g" deployment.yaml
     - cat deployment.yaml
     - kubectl apply -f deployment.yaml
+    - sleep 180s
