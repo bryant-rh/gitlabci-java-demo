@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: java-demo
-        image: registry.cn-beijing.aliyuncs.com/gitlab-demo/java-demo:IMAGE_TAG
+        image: harbor.hitales.ai/cicd/java-demo:IMAGE_TAG
         imagePullPolicy: Always
         ports:
         - containerPort: 8080
