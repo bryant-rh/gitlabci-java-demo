@@ -16,6 +16,9 @@ mvn_build_job:
     - mvn package -B -DskipTests
     - cp target/demo.war /opt/cache
     - sleep 180s
+  artifacts:
+    paths:
+      - target/*.war
 docker_build_job:
   image: registry.cn-beijing.aliyuncs.com/codepipeline/public-blueocean-codepipeline-slave-java:0.1-63b99a20
   stage: docker_build
@@ -32,7 +35,7 @@ docker_build_job:
     - echo $CI_REGISTRY_USERNAME  $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker login -u $CI_REGISTRY_USERNAME -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - mkdir target
-    - cp /opt/cache/demo.war target/demo.war
+    #- cp /opt/cache/demo.war target/demo.war
     - docker build -t $CI_REGISTRY/cicd/java-demo:$CI_PIPELINE_ID .
     - docker push $CI_REGISTRY/cicd/java-demo:$CI_PIPELINE_ID
 deploy_k8s_job:
