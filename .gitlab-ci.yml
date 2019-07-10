@@ -5,7 +5,7 @@ stages:
   - deploy_k8s
 variables:
   KUBECONFIG: /etc/deploy/config
-  #MAVEN_OPTS: "-Dmaven.repo.local=/opt/.m2/repository"
+  MAVEN_OPTS: "-Dmaven.repo.local=/opt/.m2/repository"
 mvn_build_job:
   image: registry.cn-beijing.aliyuncs.com/codepipeline/public-blueocean-codepipeline-slave-java:0.1-63b99a20
   stage: package
@@ -24,9 +24,9 @@ docker_build_job:
   tags:
     - k8s-runner
   script:
+    - echo $CI_REGISTRY_USERNAME  $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker login -u $CI_REGISTRY_USERNAME -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - mkdir target
-    - pwd
     - cp /opt/demo.war target/demo.war
     - docker build -t $CI_REGISTRY/cicd/java-demo:$CI_PIPELINE_ID .
     - docker push $CI_REGISTRY/cicd/java-demo:$CI_PIPELINE_ID
