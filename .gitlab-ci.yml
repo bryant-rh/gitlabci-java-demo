@@ -15,7 +15,7 @@ mvn_build_job:
     - pwd
     - mvn package -B -DskipTests
     - cp target/demo.war /opt/cache
-    - sleep 180s
+   # - sleep 180s
   artifacts:
     paths:
       - target/*.war
@@ -30,11 +30,11 @@ docker_build_job:
   tags:
     - k8s-runner
   script:
-    - sleep 180s
+   # - sleep 180s
     - pwd
     - echo $CI_REGISTRY_USERNAME  $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker login -u $CI_REGISTRY_USERNAME -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - mkdir target
+    #- mkdir target
     #- cp /opt/cache/demo.war target/demo.war
     - docker build -t $CI_REGISTRY/cicd/java-demo:$CI_PIPELINE_ID .
     - docker push $CI_REGISTRY/cicd/java-demo:$CI_PIPELINE_ID
